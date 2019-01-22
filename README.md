@@ -37,7 +37,8 @@ General Instructions
     call after you finish read/write. Learn to use man pages to know more about file
     management system calls (e.g, man read). 
 
-========================================================================================
+===================================================================================
+
 HW2
 Part 1
     Write a program children.c, and let the parent process produce two child
@@ -60,7 +61,8 @@ Part 2
     these variables occurring from various processes. Show the values of pid, a, and
     b printed by the processes P, Q, and R.
 
-========================================================================================
+===================================================================================
+
 HW3
 Part 1 
     Write a program where a child is created to execute command that tells you the 
@@ -102,58 +104,101 @@ Part 3
    [Step 4] After Child l finishes its execution, fork another child process, say
    Child 2 and execute Prcs_P2 that accomplishes the procedure described in Step 2.
 
+===================================================================================
 
-CSc 332 (L) - Operating Systems Lab – Spring 2018
-Task 4 - Average Grade Calculator 
+HW4 
+Average Grade Calculator 
 
-Average Grade Calculator There are 10 students enrolled in a course. The course covers
-x number of chapters from a textbook (x > 1). In each chapter y number of homework(s) are
-assigned (y≥ 1). The average grade for each homework in all the chapters need to be found
-out. To solve this, write program which has the main process as Director process, which
-reads a file containing grades of all homework assignments of all chapters and creates x
-number of Manager processes. Each Manager process will take care of solving a chapter. 
-Each manager process will create y number of Worker process and pass one homework to each
-of them and they calculate and print the average. The input file should contain the data
-according to the value of x and y. The Director process is responsible for opening and 
-closing the input text file. It stores the values in a two dimensional integer array with
-10 rows. You may need to use the following C functions (in addition to the necessary file
-& process management system calls): fopen(), fscanf(), fseek(), fclose().
+There are 10 students enrolled in a course. The course covers x number of chapters 
+from a textbook (x > 1). In each chapter y number of homework(s) are assigned 
+(y ≥ 1). The average grade for each homework in all the chapters need to be found 
+assigned (y ≥ 1). The average grade for each homework in all the chapters need to be
+found out. 
 
-Arun's explanation of the task is rather skimpy so let me explain what I want. There are
-a number of ways to implement this task, but only one way to start: you need to create a
-file like the illustration but containing a column for each homework for each chapter. 
-Let's set a minumum of 2 homeworks per chapter and 5 chapters. That gives you a 2-d array
-of 10 columns and 10 rows. The rows represent each students' grade on a homework, and the
-columns represent homework assignments, where all you need to know is that there are 2 
-per chapter. I would suggest that you create the input file sequentially, so that all the
-values for each homework for each chapter came before the next, and then all the children
-can use the same file, just starting and ending at different points (lseek). You could
-also create the input file in a spreadsheet such as Excell where it would be easy to
-randomize the different rows, and then extract that as a CSV file and export it to Linux.
-You choose. When the "Director" parent process creates the Manager children (=5, one
-for each chapter) the Director parent needs to pass the Manager children either the 
-location of the input file and the offset at which to read it or else pass the actual 
-values that the manager is responsible for as an array of arguments. 
+To solve this, write a program which has the main process as 'Director' process, 
+which reads a file containing grades of all i homework assignments of all chapters
+and creates x number of Manager processes. Each Manager process will take care of 
+solving a chapter. Each manager process will create y number of Worker process and 
+pass one homework to each of them and they calculate and print the average. The 
+input file should contain the data according to the value of x and y. 
 
-Another possibility which is fine with me is to create a separate file for each Manager 
-with just the quizzes for those chapters. Finally, you could choose not to overwrite the 
-parent code but do some tricky ifs where if I am child 1 then I am manager and I actually
-read the parent's in memory array values and so on. The process for creating workers is 
-analogous. The Manager parent either gives the worker child the path of the file to open
-and an offset at which to read its values, or else passes the actual values to be 
-averaged as a list of parameters, or else creates a file with just the values for which 
-the worker is responsible. Another way to handle this exercise is with shared memory but
-we aren't quite there yet. You also have to decide how to report back and collect the 
-averages, so that I know which chapter and homework the average grade represents. It is 
-essential that you provide me a written explanation of your process and how you 
-implemented the programs. You also need to provide me with the input file with the 
-original homework grades, and an output file with the averages, labeled in some 
-reasonable way, for instance a spreadsheet. Ideally, you would also provide me with a 
-script or log of execution so that we can see how much parallelism is achieved by 
-dividing the work up among managers and workers. 
+The Director process is responsible for opening and closing the input text file. It
+stores the values in a two dimensional integer array with 10 rows. You may need to
+use the following C functions (in addition to the necessary file & process 
+management system calls): fopen(), fscanf(), fseek(), fclose().
 
-Task 5
+===================================================================================
 
-In this folder are a number of code examples illustrating:(1) Traditional shared-memory with semaphore management of the producer- consumer problem: ProducerConsumer.c(2) A shared memory example which does not fork or create a thread but assumes each of 2 processes knows the name of the shared memory segment. This is implemented in posix API shared memory via memory mapped file. shm_msgclient.c, shm_msgserver.c(3) A shared memory example from the textbook which forks a child and uses posix shared memory but does not use posix threads. The parent forks 32 children.(4) Another example from the textbook which creates 50 posix threads which play with the value of a passed parameter, but which does not use shared memory.Your Task 5 is to take these code examples and implement a producer-consumer solution which uses both:    Posix shared memory    Posix threads.Task 5 A. Implement the producer-consumer in such a way that the parent is the producer and the thread is the consumer and the parent and thread update the values of a queue in the parent’s memory. Are there race or deadlock conditions with this solution? Would you need to add a semaphore or mutex to protect the memory object?
+HW5
 
-Task 5 B. Implement the producer-consumer in such a way that the parent creates a shared memory segment using posix API (memory mapped file) and creates a producer thread with one routine to run, and a consumer child with another routine to run. Pass the name of the shared memory file as an argument to each thread. Does this solution require a mutex or semaphore, or does the file implementation take care of mutual exclusion? Can the producer and consumer threads write to the file at the same time?Please take note:UNIX/Linux header files required by gcc vary from one Linux to another. For example, programs that compile clean on the Debian Linux prepared for the OS book throw errors and warnings on Ubuntu in the lab!The sample programs I gave you all compile clean or with minimal warnings on Ubuntu in the lab. I had to add include files in several cases. Still warnings with the format expressions in printf statements eg printf (“%d%t....Also, when compiling with posix API functions you need to use the compile flag – lpthread, when using shared memory –lrt, and when using math functions such as max(), mod() and rand() use –lmIt is best practice (and sometimes necessary to get a compile) to put the flags at the end of the gcc statement eg.gcc myfile.c –o myfile –lpthread –lrt –lm
+In this folder are a number of code examples illustrating:
+
+ (1) Traditional shared-memory with semaphore management of the producer-consumer
+     problem: ProducerConsumer.c
+ (2) A shared memory example which does not fork or create a thread but assumes each
+     of 2 processes knows the name of the shared memory segment. This is implemented
+     in posix API shared memory via memory mapped files: 
+     
+        shm_msgclient.c, shm_msgserver.c
+
+ (3) A shared memory example from the textbook which forks a child and uses posix 
+     shared memory but does not use posix threads. The parent forks 32 children.
+ (4) Another example from the textbook which creates 50 posix threads which play 
+     with the value of a passed parameter, but which does not use shared memory.
+     
+A. Your Task 5 is to take these code examples and implement a producer-consumer 
+   solution which uses both Posix shared memory & Posix threads.
+
+   Implement the producer-consumer in such a way that the parent is the producer 
+   the thread is the consumer, and the parent and thread update the values of a 
+   queue in the parent’s memory. Are there race or deadlock conditions with this 
+   solution? Would you need to add a semaphore or mutex to protect the memory 
+   object?
+
+B. Implement the producer-consumer in such a way that the parent creates a shared
+   memory segment using posix API (memory mapped file) and creates a producer thread
+   with one routine to run, and a consumer child with another routine to run. Pass 
+   the name of the shared memory file as an argument to each thread. Does this 
+   solution require a mutex or semaphore, or does the file implementation take care
+   of mutual exclusion? Can the producer and consumer threads write to the file at
+   the same time?
+
+===================================================================================
+
+TASK 6
+Cigarette Smokers Problem
+
+Consider a system with 3 smoker processes and 1 agent process. Each smoker
+continuously rolls a cigarette and then smokes it. The smoker needs three 
+ingredients: tobacco, paper, and matches. One of the smokers has paper, another has
+tobacco, and the third has matches. The agent has an infinite supply of all three
+materials and (randomly) places two of the ingredients on the table each time. The
+smoker who has the remaining ingredient then makes and smokes a cigarette, signaling
+the agent on completion. The agent then puts out another two of the three 
+ingredients, and the cycle repeats.
+
+Write a program to synchronize the agent and smoker processes either using
+traditional UNIX semaphores or using the pthread library and pthread_mutex.
+
+Instructions
+  - You need to use the sem.h header file in your semaphore-based solution.
+  - If you choose to use the traditional semaphore technique, you will want to
+    follow the semaphore code in ProducerConsumer.c and the associated sem.h header
+    file.
+  - Although the problem description gives the agent an infinite supply of
+    ingredients, you may set a reasonable finite number of iterations.
+  - You need to include an explanation of how your code succeeds in synchronizing 
+    the agent and the smokers and avoiding starvation as well as interleaving and 
+    race conditions. Provide output showing the sequence of events for several
+    iterations
+
+  - Extra credit: Instead of having the appropriate smoker wakened by the agent, 
+    let’s suppose that the agent doesn’t know which smoekr has what ingredient, and 
+    and let’s suppose that the smokers don’t know what the agent has placed in the 
+    Critical Sector without looking. Thus, implement a queue of smokers each of 
+    whom, when she accesses the CS, checks to see if the ingredients match what she
+    has, and if so, takes them and smokes, and if not, awakens the next agent in the
+    queue and then sleeps. The next smoker then checks the ingredients in the CS and
+    behaves the same way. Each smoker gets on the back of the queue when she
+    finishes smoking. It is not technically necessary to remove the ingredients 
+    placed in the CS as they only match one smoker.
